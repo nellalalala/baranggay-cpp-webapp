@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barangay Complaint Tracking System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container nav-content">
+      <div class="brand">
+        <h1>Barangay Complaint Tracking System</h1>
+        <p>Community Concerns &amp; Resolution Portal</p>
+      </div>
+      <div class="portal-switch" role="tablist">
+        <button id="tab-resident" class="switch-btn active" onclick="switchPortal('resident')">Resident Portal</button>
+        <button id="tab-admin" class="switch-btn" onclick="switchPortal('admin')">Barangay Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    
+    <!-- ==================== RESIDENT PORTAL ==================== -->
+    <section id="resident-view" class="portal-section">
+      <div class="grid-two-col">
+        
+        <!-- Submit Complaint Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Submit a Community Concern</h2>
+            <p class="subtitle">Report noise, waste, or neighborhood issues directly to barangay officials.</p>
+          </div>
+          <form id="complaint-form">
+            <p class="required-note"><span class="required">*</span> Indicates required field</p>
+
+            <div class="form-group">
+              <div class="label-row">
+                <label for="complainant">Complainant Name <span class="required">*</span></label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="anonymous-toggle" />
+                  Submit Anonymously
+                </label>
+              </div>
+              <input type="text" id="complainant" placeholder="e.g., Juan Dela Cruz" required />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="category">Complaint Category <span class="required">*</span></label>
+                <select id="category" required>
+                  <option value="" disabled selected>Select category...</option>
+                  <option value="Noise Disturbance">Noise Disturbance</option>
+                  <option value="Waste Disposal">Waste Disposal</option>
+                  <option value="Neighborhood Conflict">Neighborhood Conflict</option>
+                  <option value="Infrastructure / Public Works">Infrastructure / Public Works</option>
+                  <option value="Other Community Concern">Other Community Concern</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="location">Purok / Street <span class="required">*</span></label>
+                <input type="text" id="location" placeholder="e.g., Purok 3, Sampaguita St." required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description of Concern <span class="required">*</span></label>
+              <textarea id="description" rows="4" placeholder="Provide details, time of incident, or specific landmarks..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary full-width">Submit Complaint Report</button>
+          </form>
+
+          <!-- Generated Reference ID Banner -->
+          <div id="receipt-banner" class="receipt-box hidden">
+            <p class="receipt-title">Report Submitted Successfully</p>
+            <p class="receipt-desc">Save your Reference Tracking ID to check updates later:</p>
+            <div class="receipt-id-row">
+              <code id="generated-id">BRGY-104</code>
+              <button type="button" class="btn btn-outline btn-sm" onclick="copyTrackingId()">Copy ID</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Track Report Status Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Track Your Report Status</h2>
+            <p class="subtitle">Enter your Reference ID to check barangay review progress.</p>
+          </div>
+          <div class="track-input-group">
+            <input type="text" id="track-input" placeholder="e.g., BRGY-101" />
+            <button type="button" class="btn btn-primary" onclick="trackComplaint()">Track</button>
+          </div>
+
+          <div id="track-result" class="track-result hidden"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== ADMIN LOGIN VIEW ==================== -->
+    <section id="admin-login-view" class="portal-section hidden">
+      <div class="card login-card">
+        <div class="card-header">
+          <h2>Barangay Personnel Login</h2>
+          <p class="subtitle">Authorized access only for reviewing and updating resident reports.</p>
+        </div>
+        <form id="login-form">
+          <p class="required-note"><span class="required">*</span> Indicates required field</p>
+
+          <div class="form-group">
+            <label for="admin-user">Username <span class="required">*</span></label>
+            <input type="text" id="admin-user" placeholder="admin" required />
+          </div>
+          <div class="form-group">
+            <label for="admin-pass">Password <span class="required">*</span></label>
+            <input type="password" id="admin-pass" placeholder="••••••••••••" required />
+          </div>
+          <p id="login-error" class="error-text hidden">Invalid staff credentials. Try again.</p>
+          <div class="login-actions">
+            <button type="submit" class="btn btn-primary full-width">Sign In to Dashboard</button>
+            <button type="button" class="btn btn-ghost full-width" onclick="autofillAdmin()">Auto-fill Demo Credentials</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== ADMIN DASHBOARD VIEW ==================== -->
+    <section id="admin-dashboard-view" class="portal-section hidden">
+      <div class="dashboard-topbar">
+        <div>
+          <h2>Complaint Management Log</h2>
+          <p class="subtitle">Review resident submissions, update statuses, and add official remarks.</p>
+        </div>
+        <div class="topbar-actions">
+          <button type="button" class="btn btn-outline btn-sm" onclick="resetDemoData()">Reset Sample Data</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="logoutAdmin()">Sign Out</button>
+        </div>
+      </div>
+
+      <!-- Summary Counters -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Total Reports</span>
+          <strong class="stat-value" id="stat-total">0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Pending</span>
+          <strong class="stat-value text-amber" id="stat-pending">0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">In Progress</span>
+          <strong class="stat-value text-blue" id="stat-progress">0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Resolved</span>
+          <strong class="stat-value text-teal" id="stat-resolved">0</strong>
+        </div>
+      </div>
+
+      <!-- Search & Filter Bar -->
+      <div class="card filter-bar">
+        <input type="text" id="search-input" placeholder="Search by ID, complainant, location, or keyword..." oninput="renderAdminRecords()" />
+        <select id="filter-category" onchange="renderAdminRecords()">
+          <option value="All">All Categories</option>
+          <option value="Noise Disturbance">Noise Disturbance</option>
+          <option value="Waste Disposal">Waste Disposal</option>
+          <option value="Neighborhood Conflict">Neighborhood Conflict</option>
+          <option value="Infrastructure / Public Works">Infrastructure / Public Works</option>
+          <option value="Other Community Concern">Other Community Concern</option>
+        </select>
+        <select id="filter-status" onchange="renderAdminRecords()">
+          <option value="All">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Resolved">Resolved</option>
+        </select>
+      </div>
+
+      <!-- Records List -->
+      <div id="records-list" class="records-container"></div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
